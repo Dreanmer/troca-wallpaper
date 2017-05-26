@@ -10,6 +10,10 @@ class MobScreeny {
     register (socket, data) {
         const slot = this._findEmptySlot();
 
+        if(!slot) {
+            return false;
+        }
+
         this.devices[slot.id] = {
             id: socket.id,
             socket: socket,

@@ -46,6 +46,9 @@ Io.on('connection', (socket) => {
 
     socket.on('register', (data) => {
         let device = Screeny.register(socket, data);
+        if (!device) {
+            return false;
+        }
         console.log(data, device.coordinates);
 
         // show positions for each connected device
