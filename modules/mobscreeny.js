@@ -41,6 +41,7 @@ class MobScreeny {
         let device;
         Object.keys(this.devices).forEach((key) => {
             device = this.devices[key];
+            console.log(device, key);
             if(device.id == id) {
                 this.devices[key] = null;
                 return false;
@@ -89,8 +90,8 @@ class MobScreeny {
         const maxX = this.config.size.x;
         const maxY = this.config.size.y;
 
-        for(let x=0;x<=maxX;x++){
-            for(let y=0;y<=maxY;y++) {
+        for(let x=0;x<maxX;x++){
+            for(let y=0;y<maxY;y++) {
                 const id = String(x)+String(y);
                 if(!this.devices[id]) {
                     return {
