@@ -4,7 +4,6 @@ const Io = require('socket.io')(Server);
 const Config = require('./config.js');
 const MobScreeny = require('./modules/mobscreeny.js');
 const Screeny = new MobScreeny(Config);
-const Fs = require('fs');
 
 Server.listen(8080);
 
@@ -26,6 +25,8 @@ App.get('/status', (req, res) => {
             resY: device.resY,
             posX: device.posX,
             posY: device.posY,
+            denX: device.denX,
+            denY: device.denY,
             coordinates: device.coordinates
         });
     });
@@ -34,6 +35,11 @@ App.get('/status', (req, res) => {
         'screenSize': Screeny.getScreenSize(),
         'devices': devices
     });
+});
+
+App.get('/emitSlices', (req, res) => {
+    Screeny.emitSlices();
+    return res.send('ok');
 });
 
 App.get('/models', (req, res) => {
@@ -45,24 +51,15 @@ Io.on('connection', (socket) => {
     console.log(id + ' connected');
 
     socket.on('register', (data) => {
-        let device = Screeny.register(socket, data);
+        const device = Screeny.register(socket, data);
         if (!device) {
             return false;
         }
-        console.log(data, device.coordinates);
 
         // show positions for each connected device
         Screeny.getConnectedDevices().forEach((device) => {
             console.log('emmit: show_position - ' + device.coordinates);
             device.socket.emit('show_position', device.coordinates);
-        });
-
-        // emit test img
-        Fs.readFile('./modules/data/test.bmp', function (err, data) {
-            if (err) throw err;
-            console.log('emmit: image_ready - ' + device.coordinates);
-            console.log(data);
-            socket.emit('image_ready', data);
         });
     });
 

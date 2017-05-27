@@ -1,4 +1,5 @@
 const Models = require('./data/models.js');
+const Jimp = require("jimp");
 
 class MobScreeny {
 
@@ -51,6 +52,47 @@ class MobScreeny {
                 return false;
             }
         });
+    }
+
+    emitSlices() {
+        const connectedDevices = this.getConnectedDevices(),
+            devices = this.devices;
+
+        Jimp.read("./modules/data/test.jpg", (err, img) => {
+            if (err) throw err;
+            const screen = this.getScreenSize();
+            img.resize(800*2, 480*2);
+
+            connectedDevices.forEach((device) => {
+                let x = 0,
+                    y = 0,
+                    w = 800,
+                    h = 480;
+
+                // todo - fix the support for more than 2x2 phones
+                if(device.posX > 0) {
+                    // x = devices[String(device.posX-1)+String(device.posY)].resX;
+                    x = 800;
+                }
+                if(device.posY > 0) {
+                    // y = devices[String(device.posX)+String(device.posY-1)].resY;
+                    y = 400;
+                }
+
+                this._getImageSlice(img, x, y, w, h, (img) => {
+                    device.socket.emit('image_ready', img);
+                });
+            });
+        });
+    }
+
+    _getImageSlice(img, x, y, w, h, callback){
+        const cropedImg = new Jimp(w, h);
+        cropedImg.blit(img, 0, 0, x, y, w, h);
+        cropedImg.getBuffer(Jimp.MIME_PNG, (err, buffer) => {
+                if (err) throw err;
+                return callback(buffer);
+            });
     }
 
     getScreenSize() {
