@@ -38,8 +38,28 @@ App.get('/status', (req, res) => {
 });
 
 App.get('/emitSlices', (req, res) => {
-    Screeny.emitSlices();
+    Screeny.emitSlices(req.query.id);
     return res.send('ok');
+});
+
+let slideshow = false;
+App.get('/start', (req, res) => {
+    let count = 0,
+        max = 5;
+
+    if(slideshow) {
+        clearInterval(slideshow);
+    }
+
+    slideshow = setInterval(function () {
+        Screeny.emitSlices(count);
+        count = count == max ? 0 : count+1;
+    }, req.query.interval || 10000);
+    return res.send('ok');
+});
+
+App.get('/stop', (req, res) => {
+    clearInterval(slideshow);
 });
 
 App.get('/models', (req, res) => {

@@ -54,11 +54,11 @@ class MobScreeny {
         });
     }
 
-    emitSlices() {
+    emitSlices(id) {
         const connectedDevices = this.getConnectedDevices(),
             devices = this.devices;
 
-        Jimp.read("./modules/data/test.jpg", (err, img) => {
+        Jimp.read("./modules/data/"+id+".jpg", (err, img) => {
             if (err) throw err;
             const screen = this.getScreenSize();
             img.resize(800*2, 480*2);
@@ -76,7 +76,7 @@ class MobScreeny {
                 }
                 if(device.posY > 0) {
                     // y = devices[String(device.posX)+String(device.posY-1)].resY;
-                    y = 400;
+                    y = 480;
                 }
 
                 this._getImageSlice(img, x, y, w, h, (img) => {
